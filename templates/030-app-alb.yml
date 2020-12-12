@@ -1,0 +1,86 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: App alb fargate
+
+# ------------------------------------------------------------#
+#  Parameters
+# ------------------------------------------------------------#
+Parameters:
+  SystemName:
+    Type: String
+    Description: sample
+
+Resources:
+# ------------------------------------------------------------#
+#  ALB
+# ------------------------------------------------------------#
+  appAlb:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub ${SystemName}-app-alb
+      Scheme: internet-facing
+      Type: application
+      IpAddressType: ipv4
+      Subnets:
+        - Fn::ImportValue:
+            !Sub ${SystemName}-publicsubnet1a
+        - Fn::ImportValue:
+            !Sub ${SystemName}-publicsubnet1c
+      SecurityGroups:
+        - Fn::ImportValue:
+            !Sub ${SystemName}-app-alb-sg
+
+  appAlbTg:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub ${SystemName}-app-alb-tg
+      Protocol: HTTP
+      Port: 80
+      TargetType: ip
+      VpcId:
+        Fn::ImportValue:
+          !Sub ${SystemName}-vpc
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /healthcheck
+      HealthCheckPort: traffic-port
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 2
+      HealthCheckTimeoutSeconds: 5
+      HealthCheckIntervalSeconds: 15
+      Matcher:
+        HttpCode: 200
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 30
+
+  appListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref appAlb
+      Protocol: HTTP
+      Port: 80
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref appAlbTg
+
+# ------------------------------------------------------------#
+#  Outputs
+# ------------------------------------------------------------#
+Outputs:
+  appAlb:
+    Value: !Ref appAlb
+    Export:
+      Name: !Sub ${SystemName}-app-alb
+  appALBUrl:
+    Value:
+      Fn::Join:
+        - ""
+        - - http://
+          - Fn::GetAtt: appAlb.DNSName
+          - /
+    Export:
+      Name: !Sub ${SystemName}-app-alb-url
+  appAlbTg:
+    Value: !Ref appAlbTg
+    Export:
+      Name: !Sub ${SystemName}-app-alb-tg

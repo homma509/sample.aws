@@ -118,7 +118,7 @@ Resources:
       MapPublicIpOnLaunch: 'false'
       Tags:
       - Key: Name
-        Value: !Sub ${SystemName}-private-subnet-db-1c
+        Value: !Sub ${SystemName}-private-subnet-db-1a
       VpcId: !Ref vpc
   privateSubnet2c:
     Type: AWS::EC2::Subnet
@@ -130,6 +130,28 @@ Resources:
       Tags:
       - Key: Name
         Value: !Sub ${SystemName}-private-subnet-db-1c
+      VpcId: !Ref vpc
+  privateSubnet3a:
+    Type: AWS::EC2::Subnet
+    DependsOn: attachGateway
+    Properties:
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.0.248.0/24
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+      - Key: Name
+        Value: !Sub ${SystemName}-private-subnet-if-1a
+      VpcId: !Ref vpc
+  privateSubnet3c:
+    Type: AWS::EC2::Subnet
+    DependsOn: attachGateway
+    Properties:
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: 10.0.249.0/24
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+      - Key: Name
+        Value: !Sub ${SystemName}-private-subnet-if-1c
       VpcId: !Ref vpc
 
 # ------------------------------------------------------------#
@@ -303,3 +325,11 @@ Outputs:
     Value: !Ref privateSubnet2c
     Export:
       Name: !Sub ${SystemName}-privatesubnet2c
+  privateSubnet3a:
+    Value: !Ref privateSubnet3a
+    Export:
+      Name: !Sub ${SystemName}-privatesubnet3a
+  privateSubnet3c:
+    Value: !Ref privateSubnet3c
+    Export:
+      Name: !Sub ${SystemName}-privatesubnet3c

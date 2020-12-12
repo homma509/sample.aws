@@ -8,8 +8,8 @@ if [ $# = 1 ] && [ $1 = "deploy" ]; then
 fi
 
 # 指定パラメータ
-SYSTEM_NAME=aws-sample
-TEMPLATE=vpc
+SYSTEM_NAME=sample
+TEMPLATE=010-vpc
 
 # テンプレート実行用パラメータ
 CFN_STACK_NAME=${SYSTEM_NAME}-${TEMPLATE}

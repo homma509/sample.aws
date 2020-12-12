@@ -9,10 +9,12 @@ Parameters:
   SystemName:
     Type: String
     Description: sample
-
   AdminIpaddress:
     Type: String
     Description: Your Administrator IP Address.
+  Cloud9SecurityGroupID:
+    Type: String
+    Description: Your Cloud9 Security Group ID.
 
 Resources:
 # ------------------------------------------------------------#
@@ -113,6 +115,25 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${SystemName}-db-sg"
+#-- vpc-endpoint-sg --#
+  vpceSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub "${SystemName}-vpce-sg"
+      GroupDescription: !Sub "${SystemName}-vpce-sg"
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${SystemName}-vpc"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !Ref Cloud9SecurityGroupID
+          Description: !Sub "${SystemName}-app-vpce-sg"
+      Tags:
+        - Key: Name
+          Value: !Sub "${SystemName}-vpce-sg"
+
 # ------------------------------------------------------------#
 # Outputs
 # ------------------------------------------------------------#

@@ -1,0 +1,49 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECR
+
+# ------------------------------------------------------------#
+#  Parameters
+# ------------------------------------------------------------#
+Parameters:
+  SystemName:
+    Type: String
+    Description: sample
+
+Resources:
+# ------------------------------------------------------------#
+#  ECR
+# ------------------------------------------------------------#
+  ecrApp:
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: !Sub ${SystemName}-ecr-app
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "Delete more than 5 images",
+                "selection": {
+                  "tagStatus": "any",
+                  "countType": "imageCountMoreThan",
+                  "countNumber": 5
+                },
+                "action": {
+                  "type": "expire"
+                }
+              }
+            ]
+          }
+
+
+# ------------------------------------------------------------#
+#  Outputs
+# ------------------------------------------------------------#
+Outputs:
+  ecrApp:
+    Value: !GetAtt ecrApp.Arn
+    Export:
+      Name: !Sub ${SystemName}-ecr-app
+

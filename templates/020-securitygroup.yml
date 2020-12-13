@@ -12,9 +12,9 @@ Parameters:
   AdminIpaddress:
     Type: String
     Description: Your Administrator IP Address.
-  Cloud9SecurityGroupID:
-    Type: String
-    Description: Your Cloud9 Security Group ID.
+  # Cloud9SecurityGroupID:
+  #   Type: String
+  #   Description: Your Cloud9 Security Group ID.
 
 Resources:
 # ------------------------------------------------------------#

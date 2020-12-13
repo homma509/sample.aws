@@ -9,7 +9,7 @@ fi
 
 # 指定パラメータ
 SYSTEM_NAME=sample
-TEMPLATE=040-waf
+TEMPLATE=060-ecr
 
 # テンプレート実行用パラメータ
 CFN_STACK_NAME=${SYSTEM_NAME}-${TEMPLATE}
@@ -17,8 +17,16 @@ CFN_TEMPLATE=templates/${TEMPLATE}.yml
 
 # テンプレートの実行
 aws cloudformation deploy --stack-name ${CFN_STACK_NAME} --template-file ${CFN_TEMPLATE} ${CHANGESET_OPTION} \
-  --capabilities CAPABILITY_IAM \
   --parameter-overrides \
   SystemName=${SYSTEM_NAME}
+
+
+# deployモードのとき、ECRの設定変更を実施
+if [ $# = 1 ] && [ $1 = "deploy" ]; then
+  # 脆弱性自動スキャン設定
+  aws ecr put-image-scanning-configuration --repository-name ${SYSTEM_NAME}-ecr-app --image-scanning-configuration scanOnPush=true
+
+fi
+
 
 exit

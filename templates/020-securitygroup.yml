@@ -115,12 +115,12 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${SystemName}-db-sg"
-#-- vpc-endpoint-sg --#
-  vpceSg:
+#-- vpc-endpoint-interface-sg --#
+  ifSg:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Sub "${SystemName}-vpce-sg"
-      GroupDescription: !Sub "${SystemName}-vpce-sg"
+      GroupName: !Sub "${SystemName}-if-sg"
+      GroupDescription: !Sub "${SystemName}-if-sg"
       VpcId:
         Fn::ImportValue:
           !Sub "${SystemName}-vpc"
@@ -128,11 +128,11 @@ Resources:
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          SourceSecurityGroupId: !Ref Cloud9SecurityGroupID
-          Description: !Sub "${SystemName}-app-vpce-sg"
+          SourceSecurityGroupId: !Ref adminFargateSg
+          Description: !Sub "${SystemName}-app-if-sg"
       Tags:
         - Key: Name
-          Value: !Sub "${SystemName}-vpce-sg"
+          Value: !Sub "${SystemName}-if-sg"
 
 # ------------------------------------------------------------#
 # Outputs
@@ -158,3 +158,7 @@ Outputs:
     Value: !Ref dbSg
     Export:
       Name: !Sub "${SystemName}-db-sg"
+  ifSg:
+    Value: !Ref ifSg
+    Export:
+      Name: !Sub "${SystemName}-if-sg"

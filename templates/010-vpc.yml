@@ -43,7 +43,7 @@ Resources:
 # ------------------------------------------------------------#
 #  Subnet
 # ------------------------------------------------------------#
-  publicSubnet1a:
+  publicSubnetAlb1a:
     Type: AWS::EC2::Subnet
     DependsOn: attachGateway
     Properties:
@@ -54,7 +54,7 @@ Resources:
       - Key: Name
         Value: !Sub ${SystemName}-public-subnet-alb-1a
       VpcId: !Ref vpc
-  publicSubnet1c:
+  publicSubnetAlb1c:
     Type: AWS::EC2::Subnet
     DependsOn: attachGateway
     Properties:
@@ -65,7 +65,7 @@ Resources:
       - Key: Name
         Value: !Sub ${SystemName}-public-subnet-alb-1c
       VpcId: !Ref vpc
-  publicSubnet2a:
+  publicSubnetAdmin1a:
     Type: AWS::EC2::Subnet
     DependsOn: attachGateway
     Properties:
@@ -76,7 +76,7 @@ Resources:
       - Key: Name
         Value: !Sub ${SystemName}-public-subnet-admin-1a
       VpcId: !Ref vpc
-  publicSubnet2c:
+  publicSubnetAdmin1c:
     Type: AWS::EC2::Subnet
     DependsOn: attachGateway
     Properties:
@@ -87,7 +87,7 @@ Resources:
       - Key: Name
         Value: !Sub ${SystemName}-public-subnet-admin-1c
       VpcId: !Ref vpc
-  privateSubnet1a:
+  privateSubnetApp1a:
     Type: AWS::EC2::Subnet
     DependsOn: attachGateway
     Properties:
@@ -98,7 +98,7 @@ Resources:
       - Key: Name
         Value: !Sub ${SystemName}-private-subnet-app-1a
       VpcId: !Ref vpc
-  privateSubnet1c:
+  privateSubnetApp1c:
     Type: AWS::EC2::Subnet
     DependsOn: attachGateway
     Properties:
@@ -109,7 +109,7 @@ Resources:
       - Key: Name
         Value: !Sub ${SystemName}-private-subnet-app-1c
       VpcId: !Ref vpc
-  privateSubnet2a:
+  privateSubnetDb1a:
     Type: AWS::EC2::Subnet
     DependsOn: attachGateway
     Properties:
@@ -120,7 +120,7 @@ Resources:
       - Key: Name
         Value: !Sub ${SystemName}-private-subnet-db-1a
       VpcId: !Ref vpc
-  privateSubnet2c:
+  privateSubnetDb1c:
     Type: AWS::EC2::Subnet
     DependsOn: attachGateway
     Properties:
@@ -131,7 +131,7 @@ Resources:
       - Key: Name
         Value: !Sub ${SystemName}-private-subnet-db-1c
       VpcId: !Ref vpc
-  privateSubnet3a:
+  privateSubnetIf1a:
     Type: AWS::EC2::Subnet
     DependsOn: attachGateway
     Properties:
@@ -142,7 +142,7 @@ Resources:
       - Key: Name
         Value: !Sub ${SystemName}-private-subnet-if-1a
       VpcId: !Ref vpc
-  privateSubnet3c:
+  privateSubnetIf1c:
     Type: AWS::EC2::Subnet
     DependsOn: attachGateway
     Properties:
@@ -168,7 +168,7 @@ Resources:
   #       Fn::GetAtt:
   #         - eIP1a
   #         - AllocationId
-  #     SubnetId: !Ref publicSubnet1a
+  #     SubnetId: !Ref publicSubnetAlb1a
   #     Tags:
   #       - Key: Name
   #         Value: !Sub ${SystemName}-ngw-1a
@@ -183,7 +183,7 @@ Resources:
   #       Fn::GetAtt:
   #         - eip1c
   #         - AllocationId
-  #     SubnetId: !Ref publicSubnet1c
+  #     SubnetId: !Ref publicSubnetAlb1c
   #     Tags:
   #       - Key: Name
   #         Value: !Sub ${SystemName}-ngw-1c
@@ -191,36 +191,48 @@ Resources:
 # ------------------------------------------------------------#
 #  RouteTable
 # ------------------------------------------------------------#
-  publicRouteTable:
+  publicRouteTableAlb:
     Type: AWS::EC2::RouteTable
     DependsOn: attachGateway
     Properties:
       VpcId: !Ref vpc
       Tags:
       - Key: Name
-        Value: !Sub ${SystemName}-public-rt
-  publicRoute:
+        Value: !Sub ${SystemName}-public-alb-rt
+  publicRouteAlb:
     Type: AWS::EC2::Route
     DependsOn: attachGateway
     Properties:
-      RouteTableId: !Ref publicRouteTable
+      RouteTableId: !Ref publicRouteTableAlb
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref internetGateway
-  # privateRouteTable1a:
-  #   Type: AWS::EC2::RouteTable
-  #   DependsOn: nat1a
-  #   Properties:
-  #     VpcId: !Ref vpc
-  #     Tags:
-  #     - Key: Name
-  #       Value: !Sub ${SystemName}-private-rt1a
-  # privateRoute1a:
+  publicRouteTableAdmin:
+    Type: AWS::EC2::RouteTable
+    DependsOn: attachGateway
+    Properties:
+      VpcId: !Ref vpc
+      Tags:
+      - Key: Name
+        Value: !Sub ${SystemName}-public-admin-rt
+  publicRouteAdmin:
+    Type: AWS::EC2::Route
+    DependsOn: attachGateway
+    Properties:
+      RouteTableId: !Ref publicRouteTableAdmin
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref internetGateway
+  privateRouteTableApp:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref vpc
+      Tags:
+      - Key: Name
+        Value: !Sub ${SystemName}-private-app-rt
+  # privateRouteApp:
   #   Type: AWS::EC2::Route
-  #   DependsOn: nat1a
   #   Properties:
-  #     RouteTableId: !Ref privateRouteTable1a
+  #     RouteTableId: !Ref privateRouteTableApp
   #     DestinationCidrBlock: 0.0.0.0/0
-  #     NatGatewayId: !Ref NAT1a
   # privateRouteTable1c:
   #   Type: AWS::EC2::RouteTable
   #   DependsOn: nat1c
@@ -244,45 +256,45 @@ Resources:
   #     - Key: Name
   #       Value: !Sub ${SystemName}-Private-RT2
 
-  publicSubnet1aRouteTableAssociation:
+  publicSubnetAlb1aRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref publicSubnet1a
-      RouteTableId: !Ref publicRouteTable
-  publicSubnet1cRouteTableAssociation:
+      SubnetId: !Ref publicSubnetAlb1a
+      RouteTableId: !Ref publicRouteTableAlb
+  publicSubnetAlb1cRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref publicSubnet1c
-      RouteTableId: !Ref publicRouteTable
-  publicSubnet2aRouteTableAssociation:
+      SubnetId: !Ref publicSubnetAlb1c
+      RouteTableId: !Ref publicRouteTableAlb
+  publicSubnetAdmin1aRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref publicSubnet2a
-      RouteTableId: !Ref publicRouteTable
-  publicSubnet2cRouteTableAssociation:
+      SubnetId: !Ref publicSubnetAdmin1a
+      RouteTableId: !Ref publicRouteTableAdmin
+  publicSubnetAdmin1cRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref publicSubnet2c
-      RouteTableId: !Ref publicRouteTable
-  # privateSubnet1aRouteTableAssociation:
-  #   Type: AWS::EC2::SubnetRouteTableAssociation
-  #   Properties:
-  #     SubnetId: !Ref privateSubnet1a
-  #     RouteTableId: !Ref privateRouteTable1a
-  # privateSubnet1cRouteTableAssociation:
-  #   Type: AWS::EC2::SubnetRouteTableAssociation
-  #   Properties:
-  #     SubnetId: !Ref privateSubnet1c
-  #     RouteTableId: !Ref privateRouteTable1c
+      SubnetId: !Ref publicSubnetAdmin1c
+      RouteTableId: !Ref publicRouteTableAdmin
+  privateSubnetApp1aRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref privateSubnetApp1a
+      RouteTableId: !Ref privateRouteTableApp
+  privateSubnetApp1cRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref privateSubnetApp1c
+      RouteTableId: !Ref privateRouteTableApp
   # privateSubnet2aRouteTableAssociation:
   #   Type: AWS::EC2::SubnetRouteTableAssociation
   #   Properties:
-  #     SubnetId: !Ref privateSubnet2a
+  #     SubnetId: !Ref privateSubnetDb1a
   #     RouteTableId: !Ref privateRouteTable2
   # privateSubnet2cRouteTableAssociation:
   #   Type: AWS::EC2::SubnetRouteTableAssociation
   #   Properties:
-  #     SubnetId: !Ref privateSubnet2c
+  #     SubnetId: !Ref privateSubnetDb1c
   #     RouteTableId: !Ref privateRouteTable2
 
 # ------------------------------------------------------------#
@@ -293,43 +305,51 @@ Outputs:
     Value: !Ref vpc
     Export:
       Name: !Sub ${SystemName}-vpc
-  publicSubnet1a:
-    Value: !Ref publicSubnet1a
+  publicSubnetAlb1a:
+    Value: !Ref publicSubnetAlb1a
     Export:
-      Name: !Sub ${SystemName}-publicsubnet1a
-  publicSubnet1c:
-    Value: !Ref publicSubnet1c
+      Name: !Sub ${SystemName}-public-subnet-alb-1a
+  publicSubnetAlb1c:
+    Value: !Ref publicSubnetAlb1c
     Export:
-      Name: !Sub ${SystemName}-publicsubnet1c
-  publicSubnet2a:
-    Value: !Ref publicSubnet2a
+      Name: !Sub ${SystemName}-public-subnet-alb-1c
+  publicSubnetAdmin1a:
+    Value: !Ref publicSubnetAdmin1a
     Export:
-      Name: !Sub ${SystemName}-publicsubnet2a
-  publicSubnet2c:
-    Value: !Ref publicSubnet2c
+      Name: !Sub ${SystemName}-public-subnet-admin-1a
+  publicSubnetAdmin1c:
+    Value: !Ref publicSubnetAdmin1c
     Export:
-      Name: !Sub ${SystemName}-publicsubnet2c
-  privateSubnet1a:
-    Value: !Ref privateSubnet1a
+      Name: !Sub ${SystemName}-public-subnet-admin-1c
+  privateSubnetApp1a:
+    Value: !Ref privateSubnetApp1a
     Export:
-      Name: !Sub ${SystemName}-privatesubnet1a
-  privateSubnet1c:
-    Value: !Ref privateSubnet1c
+      Name: !Sub ${SystemName}-private-subnet-app-1a
+  privateSubnetApp1c:
+    Value: !Ref privateSubnetApp1c
     Export:
-      Name: !Sub ${SystemName}-privatesubnet1c
-  privateSubnet2a:
-    Value: !Ref privateSubnet2a
+      Name: !Sub ${SystemName}-private-subnet-app-1c
+  privateSubnetDb1a:
+    Value: !Ref privateSubnetDb1a
     Export:
-      Name: !Sub ${SystemName}-privatesubnet2a
-  privateSubnet2c:
-    Value: !Ref privateSubnet2c
+      Name: !Sub ${SystemName}-private-subnet-db-1a
+  privateSubnetDb1c:
+    Value: !Ref privateSubnetDb1c
     Export:
-      Name: !Sub ${SystemName}-privatesubnet2c
-  privateSubnet3a:
-    Value: !Ref privateSubnet3a
+      Name: !Sub ${SystemName}-private-subnet-db-1c
+  privateSubnetIf1a:
+    Value: !Ref privateSubnetIf1a
     Export:
-      Name: !Sub ${SystemName}-privatesubnet3a
-  privateSubnet3c:
-    Value: !Ref privateSubnet3c
+      Name: !Sub ${SystemName}-private-subnet-if-1a
+  privateSubnetIf1c:
+    Value: !Ref privateSubnetIf1c
     Export:
-      Name: !Sub ${SystemName}-privatesubnet3c
+      Name: !Sub ${SystemName}-private-subnet-if-1c
+  publicRouteTableAdmin:
+    Value: !Ref publicRouteTableAdmin
+    Export:
+      Name: !Sub ${SystemName}-public-admin-rt
+  privateRouteTableApp:
+    Value: !Ref privateRouteTableApp
+    Export:
+      Name: !Sub ${SystemName}-private-app-rt

@@ -9,7 +9,7 @@ fi
 
 # 指定パラメータ
 SYSTEM_NAME=sample
-TEMPLATE=030-app-alb
+TEMPLATE=040-app-alb
 
 # テンプレート実行用パラメータ
 CFN_STACK_NAME=${SYSTEM_NAME}-${TEMPLATE}

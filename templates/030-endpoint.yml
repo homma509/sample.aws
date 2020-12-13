@@ -1,0 +1,104 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPC Network
+
+# ------------------------------------------------------------#
+#  Parameters
+# ------------------------------------------------------------#
+Parameters:
+  SystemName:
+    Type: String
+    Description: sample
+
+Resources:
+# ------------------------------------------------------------#
+#  Endpoint
+# ------------------------------------------------------------#
+    ecrApiEndpoint:
+        Type: "AWS::EC2::VPCEndpoint"
+        Properties:
+            VpcEndpointType: "Interface"
+            VpcId:
+              Fn::ImportValue:
+                !Sub "${SystemName}-vpc"
+            ServiceName: !Sub "com.amazonaws.${AWS::Region}.ecr.api"
+            PolicyDocument: |
+                {
+                    "Statement": [
+                        {
+                            "Action": "*",
+                            "Effect": "Allow",
+                            "Resource": "*",
+                            "Principal": "*"
+                        }
+                    ]
+                }
+            SubnetIds: 
+              - Fn::ImportValue:
+                  !Sub ${SystemName}-private-subnet-if-1a
+              - Fn::ImportValue:
+                  !Sub ${SystemName}-private-subnet-if-1c
+            PrivateDnsEnabled: true
+            SecurityGroupIds: 
+              - Fn::ImportValue:
+                  !Sub ${SystemName}-if-sg
+    ecrDkrEndpoint:
+        Type: "AWS::EC2::VPCEndpoint"
+        Properties:
+            VpcEndpointType: "Interface"
+            VpcId:
+              Fn::ImportValue:
+                !Sub "${SystemName}-vpc"
+            ServiceName: !Sub "com.amazonaws.${AWS::Region}.ecr.dkr"
+            PolicyDocument: |
+                {
+                    "Statement": [
+                        {
+                            "Action": "*",
+                            "Effect": "Allow",
+                            "Resource": "*",
+                            "Principal": "*"
+                        }
+                    ]
+                }
+            SubnetIds: 
+              - Fn::ImportValue:
+                  !Sub ${SystemName}-private-subnet-if-1a
+              - Fn::ImportValue:
+                  !Sub ${SystemName}-private-subnet-if-1c
+            PrivateDnsEnabled: true
+            SecurityGroupIds: 
+              - Fn::ImportValue:
+                  !Sub ${SystemName}-if-sg
+    s3Endpoint:
+        Type: "AWS::EC2::VPCEndpoint"
+        Properties:
+            VpcEndpointType: "Gateway"
+            VpcId:
+              Fn::ImportValue:
+                !Sub "${SystemName}-vpc"
+            ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+            PolicyDocument: "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}"
+            RouteTableIds: 
+              - Fn::ImportValue:
+                  !Sub ${SystemName}-public-admin-rt
+              - Fn::ImportValue:
+                  !Sub ${SystemName}-private-app-rt
+            PrivateDnsEnabled: false
+
+# ------------------------------------------------------------#
+#  Outputs
+# ------------------------------------------------------------#
+Outputs:
+  ecrApiEndpoint:
+    Value: !Ref ecrApiEndpoint
+    Export:
+      Name: !Sub ${SystemName}-endpoint-ecr-api
+  ecrDkrEndpoint:
+    Value: !Ref ecrDkrEndpoint
+    Export:
+      Name: !Sub ${SystemName}-endpoint-ecr-dkr
+  s3Endpoint:
+    Value: !Ref s3Endpoint
+    Export:
+      Name: !Sub ${SystemName}-endpoint-s3

@@ -13,8 +13,9 @@ TENPLATE=020-securitygroup
 
 # 指定必須パラメータ
 # 実施環境のグローバルIPアドレスを'curl inet-ip.info'などを利用して、以下に指定してください。
-ADMIN_IPADDRESS=
-CLOUD9_SECURITY_GROUP_ID=
+# 例）ADMIN_IPADDRESS=123.123.123.123/32
+ADMIN_IPADDRESS=123.123.123.123/32
+CLOUD9_SECURITY_GROUP_ID=xxxxxid
 
 if [ -z "${ADMIN_IPADDRESS}" ]; then
   echo "シェルの中でADMIN_IPADDRESSを指定してください。"
